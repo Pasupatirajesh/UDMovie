@@ -1,12 +1,12 @@
 package com.example.android.movie.Movie;
 
-import java.io.Serializable;
+import org.parceler.Parcel;
 
 /**
  * Created by SSubra27 on 3/20/17.
  */
-
-public class Movie implements Serializable {
+@Parcel
+public class Movie {
 
     public String mMovieName;
 

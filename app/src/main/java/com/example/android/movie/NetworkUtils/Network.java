@@ -22,19 +22,33 @@ import java.util.Scanner;
  */
 
 public class Network {
-    private static final String MOVIE_API_BASE_URL = "https://api.themoviedb.org/3/movie/popular?";
+    private static final String MOVIE_API_POPULAR_URL = "http://api.themoviedb.org/3/movie/popular?";
+    private static final String MOVIE_API_TOP_RATED_URL = "http://api.themoviedb.org/3/movie/top_rated?";
     private static final String API_KEY = "0c8e96b68c5e24e2ee85490b30b0e383";
 
 
 
-    public static URL buildUrl() {
+    public static URL buildUrl(boolean topRated) {
 
-        Uri queryUrl = Uri.parse(MOVIE_API_BASE_URL).buildUpon()
-                .appendQueryParameter("method", "get")
-                .appendQueryParameter("api_key", API_KEY)
-                .appendQueryParameter("format", "json")
-                .appendQueryParameter("nosjsoncallback", "1")
-                .build();
+        Uri queryUrl;
+
+        if(topRated==true)
+        {
+            queryUrl = Uri.parse(MOVIE_API_TOP_RATED_URL).buildUpon()
+                    .appendQueryParameter("method", "get")
+                    .appendQueryParameter("api_key", API_KEY)
+                    .appendQueryParameter("format", "json")
+                    .appendQueryParameter("nosjsoncallback", "1")
+                    .build();
+        } else
+        {
+            queryUrl = Uri.parse(MOVIE_API_POPULAR_URL).buildUpon()
+                    .appendQueryParameter("method", "get")
+                    .appendQueryParameter("api_key", API_KEY)
+                    .appendQueryParameter("format", "json")
+                    .appendQueryParameter("nosjsoncallback", "1")
+                    .build();
+        }
 
         URL url = null;
 
@@ -46,11 +60,34 @@ public class Network {
 
         return url;
     }
-    public ArrayList<Movie> fetchItems() throws JSONException, IOException
+
+
+    public static String getResponseFromHttpUrl(URL queryUrl) throws IOException {
+        HttpURLConnection connection = (HttpURLConnection) queryUrl.openConnection();
+        try {
+            InputStream in = connection.getInputStream();
+
+            Scanner sc = new Scanner(in);
+            sc.useDelimiter("//A");
+
+            boolean hasInput = sc.hasNext();
+
+            if (hasInput) {
+                return sc.next();
+            } else {
+                return null;
+            }
+        } finally {
+            connection.disconnect();
+        }
+    }
+
+    public ArrayList<Movie> fetchItems(boolean filter) throws JSONException, IOException
     {
         ArrayList<Movie> arrayList = new ArrayList<>();
-        URL url = buildUrl();
-        String responseStringJson =  getResponsefromHttpUrl(url);
+
+        URL url = buildUrl(filter);
+        String responseStringJson =  getResponseFromHttpUrl(url);
 
 
         JSONObject jsonObject = new JSONObject(responseStringJson);
@@ -78,26 +115,6 @@ public class Network {
 
             movies.add(movie);
             Log.i("MOVIE", movies.get(i).getMovieInfo()+"");
-        }
-    }
-
-    public static String getResponsefromHttpUrl(URL queryUrl) throws IOException {
-        HttpURLConnection connection = (HttpURLConnection) queryUrl.openConnection();
-        try {
-            InputStream in = connection.getInputStream();
-
-            Scanner sc = new Scanner(in);
-            sc.useDelimiter("//A");
-
-            boolean hasInput = sc.hasNext();
-
-            if (hasInput) {
-                return sc.next();
-            } else {
-                return null;
-            }
-        } finally {
-            connection.disconnect();
         }
     }
 }

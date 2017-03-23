@@ -21,13 +21,24 @@ import java.util.ArrayList;
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
 
     private Context context;
-    private ArrayList<Movie> mMovieData;
+    private static ArrayList<Movie> mMovieData;
 
-    public MovieAdapter(Context ct, ArrayList mD)
+    private onItemClickInterface mOnItemClickInterface;
+
+
+    public interface onItemClickInterface
+    {
+        void onItemClicked(int clickedListItem);
+    }
+
+    public MovieAdapter(Context ct, ArrayList<Movie> mt, onItemClickInterface on)
     {
         context = ct;
-        mMovieData = mD;
+        mMovieData=mt;
+        mOnItemClickInterface = on;
     }
+
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
@@ -41,6 +52,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Movie movie = mMovieData.get(position);
+
         String imageUri= "https://image.tmdb.org/t/p/w185/"+movie.getMoviePosterPath();
 
         Picasso.with(context).load(imageUri).into(holder.mMoviewPosterView);
@@ -53,7 +65,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         return mMovieData.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
         private ImageView mMoviewPosterView;
         private TextView mMovieName;
@@ -62,7 +74,12 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
             super(itemView);
             mMoviewPosterView=(ImageView) itemView.findViewById(R.id.iv_movie_poster);
             mMovieName=(TextView) itemView.findViewById(R.id.tv_movie_name);
-
+            itemView.setOnClickListener(this);
+        }
+        @Override
+        public void onClick(View v) {
+            int itemClicked = getAdapterPosition();
+            mOnItemClickInterface.onItemClicked(itemClicked);
         }
     }
 
