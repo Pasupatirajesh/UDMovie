@@ -24,7 +24,9 @@ import java.util.Scanner;
 public class Network {
     private static final String MOVIE_API_POPULAR_URL = "http://api.themoviedb.org/3/movie/popular?";
     private static final String MOVIE_API_TOP_RATED_URL = "http://api.themoviedb.org/3/movie/top_rated?";
+
     private static final String MOVIE_API_TRAILER_URL = "http://api.themoviedb.org/3/movie/";
+
     private static final String API_KEY = "0c8e96b68c5e24e2ee85490b30b0e383";
 
 
@@ -41,7 +43,9 @@ public class Network {
                     .appendQueryParameter("format", "json")
                     .appendQueryParameter("nosjsoncallback", "1")
                     .build();
+
             Log.i("NetworkURL", ""+queryUrl);
+
         } else
         {
             queryUrl = Uri.parse(MOVIE_API_POPULAR_URL).buildUpon()
@@ -62,6 +66,7 @@ public class Network {
 
         return url;
     }
+
 
     // Current Method that I am having issues with. Logged to get the URL that is generated.
 
@@ -90,6 +95,7 @@ public class Network {
         }
         return trailerUrl;
     }
+
 
 
     public static String getResponseFromHttpUrl(URL queryUrl) throws IOException {
