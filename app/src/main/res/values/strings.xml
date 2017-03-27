@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Movie</string>
+    <string name="action_settings">Settings</string>
+    <string name="movie_name">Title</string>
+
+    <string name="action_filter">Filter</string>
+
+    <string name="popular_filter">Popular</string>
+    <string name="top_rated_filter">Top-Rated</string>
+
+    <string name="message_for_no_network">Please check network connectivity or try later!!!</string>
+
+</resources>
