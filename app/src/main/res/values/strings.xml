@@ -10,4 +10,6 @@
 
     <string name="message_for_no_network">Please check network connectivity or try later!!!</string>
 
+    <string name="my_fav_button">Add to favorites</string>
+
 </resources>

@@ -1,26 +1,27 @@
 package com.example.android.movie.Activity;
+
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.android.movie.Databases.FavoriteMovieHelper;
 import com.example.android.movie.Movie.Movie;
-
 import com.example.android.movie.NetworkUtils.Network;
-
 import com.example.android.movie.R;
 import com.squareup.picasso.Picasso;
 
 import org.parceler.Parcels;
+
+import static com.example.android.movie.Databases.FavoriteMovieContract.FavoriteMovieEntry;
 
 public class MovieDetailActivity extends AppCompatActivity {
 
@@ -29,10 +30,13 @@ public class MovieDetailActivity extends AppCompatActivity {
     private TextView mReleaseDateTextView;
     private TextView mAverageScoreTextView;
     private TextView mSynopsisTextView;
+    private Button mFavButton;
 
     private Button mTrailerButton;
 
     private Movie movie;
+
+    private SQLiteDatabase mDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +50,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         mSynopsisTextView =(TextView) findViewById(R.id.tv_synopsis_view);
 
         mTrailerButton=(Button) findViewById(R.id.bv_trailer);
+        mFavButton = (Button)findViewById(R.id.add_to_fav_button);
 
 
 
@@ -59,7 +64,7 @@ public class MovieDetailActivity extends AppCompatActivity {
 
                movie = Parcels.unwrap(myIntent.getParcelable("MovieDataArrayList"));
 
-               Movie movie = Parcels.unwrap(myIntent.getParcelable("MovieDataArrayList"));
+//               Movie movie = Parcels.unwrap(myIntent.getParcelable("MovieDataArrayList"));
 
                 Log.i("MovieDetailActivity", ""+ movie.getMovieName());
                 mTitleTextView.setText(movie.getMovieName());
@@ -84,17 +89,56 @@ public class MovieDetailActivity extends AppCompatActivity {
                 startActivity(trailerIntent);
             }
         });
-    }
-}
+
+        mFavButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                final FavoriteMovieHelper mMovieHelper = new FavoriteMovieHelper(MovieDetailActivity.this);
+
+                mDb = mMovieHelper.getWritableDatabase();
+
+                ContentValues cv = new ContentValues();
+
+                cv.put(FavoriteMovieEntry.MOVIE_NAME, movie.getMovieName());
+                cv.put(FavoriteMovieEntry.RELEASE_DATE, movie.getMovieReleaseDate());
+                cv.put(FavoriteMovieEntry.MOVIE_REVIEW, movie.getMovieInfo());
 
 
+                Cursor mCursor = getMovieNames(movie.getMovieName());
 
+                if(mCursor.equals(movie.getMovieName()))
+                {
+                    Toast.makeText(MovieDetailActivity.this,"This movie has already been favorited", Toast.LENGTH_SHORT).show();
+                }
+                mDb.insert(FavoriteMovieEntry.TABLE_NAME,null,cv);
 
-
-
+                mFavButton.invalidate();
             }
-        }
+        });
+    }
 
+
+    private Cursor getMovieNames(String movieName)
+    {
+        return mDb.query(FavoriteMovieEntry.TABLE_NAME,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        FavoriteMovieEntry.MOVIE_NAME);
 
     }
 }
+
+
+
+
+
+
+
+
+
+
+

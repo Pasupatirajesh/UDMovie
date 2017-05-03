@@ -21,7 +21,7 @@ import java.util.ArrayList;
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
 
     private Context context;
-    private static ArrayList<Movie> mMovieData;
+    private static ArrayList<Movie> mMovieData ;
 
     private onItemClickInterface mOnItemClickInterface;
 
@@ -62,6 +62,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
 
     @Override
     public int getItemCount() {
+
         return mMovieData.size();
     }
 

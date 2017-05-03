@@ -24,6 +24,7 @@ import com.example.android.movie.Adapter.MovieAdapter;
 import com.example.android.movie.Movie.Movie;
 import com.example.android.movie.NetworkUtils.Network;
 import com.example.android.movie.R;
+import com.facebook.stetho.Stetho;
 
 import org.parceler.Parcels;
 
@@ -50,6 +51,7 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.onI
         setContentView(R.layout.activity_movie);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        Stetho.initializeWithDefaults(this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
