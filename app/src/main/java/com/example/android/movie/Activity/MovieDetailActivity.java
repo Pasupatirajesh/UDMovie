@@ -64,8 +64,6 @@ public class MovieDetailActivity extends AppCompatActivity {
 
                movie = Parcels.unwrap(myIntent.getParcelable("MovieDataArrayList"));
 
-//               Movie movie = Parcels.unwrap(myIntent.getParcelable("MovieDataArrayList"));
-
                 Log.i("MovieDetailActivity", ""+ movie.getMovieName());
                 mTitleTextView.setText(movie.getMovieName());
                 String imageUri = "https://image.tmdb.org/t/p/w185/"+movie.getMoviePosterPath();
@@ -113,7 +111,7 @@ public class MovieDetailActivity extends AppCompatActivity {
                 }
                 mDb.insert(FavoriteMovieEntry.TABLE_NAME,null,cv);
 
-                mFavButton.invalidate();
+           
             }
         });
     }
