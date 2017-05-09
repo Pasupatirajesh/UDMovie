@@ -12,4 +12,6 @@
 
     <string name="my_fav_button">Add to favorites</string>
 
+    <string name="favorite_movies">Favorites</string>
+
 </resources>

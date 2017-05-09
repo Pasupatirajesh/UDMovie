@@ -193,6 +193,10 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.onI
                     this.invalidateOptionsMenu();
                     upDateUI();
                     return true;
+            case R.id.menu_favorites:
+                Intent intent = new Intent(this, FavoriteMovieDisplayActivity.class);
+                startActivity(intent);
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }

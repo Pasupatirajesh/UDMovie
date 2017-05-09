@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import static com.example.android.movie.Databases.FavoriteMovieContract.*;
+import static com.example.android.movie.Databases.FavoriteMovieContract.FavoriteMovieEntry.MOVIE_ID;
 
 /**
  * Created by SSubra27 on 5/2/17.
@@ -14,7 +15,7 @@ public class FavoriteMovieHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME ="favortieMovieHelper.db";
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
 
     public FavoriteMovieHelper(Context context)
     {
@@ -26,12 +27,23 @@ public class FavoriteMovieHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+//        final String SQL_CREATE_FAVORITE_MOVIE_TABLE = "CREATE TABLE "+
+//                FavoriteMovieEntry.TABLE_NAME + " ("+
+//                FavoriteMovieEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+//                MOVIE_ID + " TEXT NOT NULL,"  +
+//                FavoriteMovieEntry.MOVIE_NAME+ " TEXT NOT NULL," +
+//                FavoriteMovieEntry.RELEASE_DATE+ " TEXT NOT NULL," +
+//                FavoriteMovieEntry.MOVIE_REVIEW+ " TEXT NOT NULL," +
+//                " UNIQUE (" + FavoriteMovieEntry.MOVIE_ID+ ") ON CONFLICT REPLACE);";
+
         final String SQL_CREATE_FAVORITE_MOVIE_TABLE = "CREATE TABLE "+
                 FavoriteMovieEntry.TABLE_NAME + " ("+
                 FavoriteMovieEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                MOVIE_ID + " TEXT NOT NULL,"  +
                 FavoriteMovieEntry.MOVIE_NAME+ " TEXT NOT NULL," +
                 FavoriteMovieEntry.RELEASE_DATE+ " TEXT NOT NULL," +
                 FavoriteMovieEntry.MOVIE_REVIEW+ " TEXT NOT NULL" + ");";
+
 
         db.execSQL(SQL_CREATE_FAVORITE_MOVIE_TABLE);
     }

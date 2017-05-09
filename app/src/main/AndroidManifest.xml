@@ -22,10 +22,20 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".Activity.MovieDetailActivity"
-                  android:parentActivityName=".Activity.MovieActivity">
-
+        <activity
+            android:name=".Activity.MovieDetailActivity"
+            android:parentActivityName=".Activity.MovieActivity">
         </activity>
+        <activity android:name=".Activity.FavoriteMovieDisplayActivity"
+                  android:parentActivityName=".Activity.MovieActivity">
+        </activity>
+
+        <provider
+            android:name=".Databases.FavoriteMovieContentProvider"
+            android:authorities="com.example.android.movie"
+            android:exported="false"/>
+
+
     </application>
 
 </manifest>

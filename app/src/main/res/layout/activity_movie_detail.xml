@@ -40,7 +40,6 @@
         android:layout_above="@+id/tv_synopsis_view"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginBottom="14dp"
         android:layout_toRightOf="@+id/iv_poster_view"
         android:layout_toEndOf="@+id/iv_poster_view"/>
 
@@ -68,12 +67,11 @@
         android:id="@+id/add_to_fav_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="@string/my_fav_button"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="12dp"
-        android:layout_marginStart="12dp"
-        android:layout_toEndOf="@+id/iv_poster_view"
         android:layout_toRightOf="@+id/iv_poster_view"
-        android:text="@string/my_fav_button"/>
+        android:layout_toEndOf="@+id/iv_poster_view"
+        android:layout_above="@+id/tv_avg_rating"/>
 
 
 </RelativeLayout>

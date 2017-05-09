@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -38,6 +39,8 @@ public class MovieDetailActivity extends AppCompatActivity {
 
     private SQLiteDatabase mDb;
 
+    private Cursor mCursor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,27 +59,47 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         Bundle myIntent = getIntent().getExtras();
 
-        if(myIntent !=null)
-        {
-            if(myIntent.getParcelable("MovieDataArrayList")!=null)
-            {
+        if(myIntent !=null) {
+            if (myIntent.getParcelable("MovieDataArrayList") != null) {
 
 
-               movie = Parcels.unwrap(myIntent.getParcelable("MovieDataArrayList"));
-
-                Log.i("MovieDetailActivity", ""+ movie.getMovieName());
+                movie = Parcels.unwrap(myIntent.getParcelable("MovieDataArrayList"));
                 mTitleTextView.setText(movie.getMovieName());
-                String imageUri = "https://image.tmdb.org/t/p/w185/"+movie.getMoviePosterPath();
+                String imageUri = "https://image.tmdb.org/t/p/w185/" + movie.getMoviePosterPath();
                 Picasso.with(getApplicationContext()).load(imageUri).into(mPosterImageView);
-                String avgScore =""+movie.getMovieAvgScore();
+                String avgScore = "" + movie.getMovieAvgScore();
                 mAverageScoreTextView.setText(avgScore);
                 mReleaseDateTextView.setText(movie.getMovieReleaseDate());
                 mSynopsisTextView.setText(movie.getMovieInfo());
 
-                Log.i("TrailerURL", ""+ Network.buildTrailerUrl(String.valueOf(movie.getMovieId())));
+                Log.i("TrailerURL", "" + Network.buildTrailerUrl(String.valueOf(movie.getMovieId())));
             }
-        }
 
+            FavoriteMovieHelper favoriteMovieHelper = new FavoriteMovieHelper(this);
+
+            mDb = favoriteMovieHelper.getReadableDatabase();
+
+            mCursor = getMovieNames(movie.getMovieId());
+
+            if(mCursor.getCount() !=0)
+            {
+                mCursor.moveToFirst();
+
+                Log.i("cursorIndex", mCursor.getString(mCursor.getColumnIndex(FavoriteMovieEntry.MOVIE_ID)));
+
+                String movieId = mCursor.getString(mCursor.getColumnIndex(FavoriteMovieEntry.MOVIE_ID));
+
+                if (movieId.equals("" + movie.getMovieId())) {
+                    Toast.makeText(MovieDetailActivity.this, "This button was already clicked", Toast.LENGTH_SHORT).show();
+                    mFavButton.setEnabled(false);
+                }
+            } else
+            {
+                Log.i("Zero Cursor", "Zero items in the cursor");
+            }
+
+
+        }
         // Method not complete yet, as I am trying to figure out the right way to pass the network endpoint
 
         mTrailerButton.setOnClickListener(new View.OnClickListener() {
@@ -92,42 +115,48 @@ public class MovieDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                final FavoriteMovieHelper mMovieHelper = new FavoriteMovieHelper(MovieDetailActivity.this);
-
-                mDb = mMovieHelper.getWritableDatabase();
-
-                ContentValues cv = new ContentValues();
-
-                cv.put(FavoriteMovieEntry.MOVIE_NAME, movie.getMovieName());
-                cv.put(FavoriteMovieEntry.RELEASE_DATE, movie.getMovieReleaseDate());
-                cv.put(FavoriteMovieEntry.MOVIE_REVIEW, movie.getMovieInfo());
-
-
-                Cursor mCursor = getMovieNames(movie.getMovieName());
-
-                if(mCursor.equals(movie.getMovieName()))
-                {
-                    Toast.makeText(MovieDetailActivity.this,"This movie has already been favorited", Toast.LENGTH_SHORT).show();
-                }
-                mDb.insert(FavoriteMovieEntry.TABLE_NAME,null,cv);
-
-           
+                onClickAddMovie(v);
             }
         });
     }
 
 
-    private Cursor getMovieNames(String movieName)
+    private Cursor getMovieNames(long movieId)
     {
-        return mDb.query(FavoriteMovieEntry.TABLE_NAME,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        FavoriteMovieEntry.MOVIE_NAME);
+        String table = FavoriteMovieEntry.TABLE_NAME;
+
+        String[] columns = new String[] {FavoriteMovieEntry.MOVIE_ID};
+
+        String selection = FavoriteMovieEntry.MOVIE_ID + "=?";
+
+        String[] selectionargs = {String.valueOf(movieId)};
+        }
+        });
+        return mDb.query(table,columns,selection, selectionargs,null,null,null,null);
 
     }
+
+    private void onClickAddMovie(View view)
+    {
+        if(mFavButton.isEnabled())
+        {
+            ContentValues cv = new ContentValues();
+            cv.put(FavoriteMovieEntry.MOVIE_ID, ""+movie.getMovieId());
+            cv.put(FavoriteMovieEntry.MOVIE_NAME, movie.getMovieName());
+            cv.put(FavoriteMovieEntry.RELEASE_DATE, movie.getMovieReleaseDate());
+            cv.put(FavoriteMovieEntry.MOVIE_REVIEW, movie.getMovieInfo());
+
+            Uri uri = getContentResolver().insert(FavoriteMovieEntry.CONTENT_URI, cv);
+
+            if(uri !=null)
+            {
+                Toast.makeText(getApplicationContext(), uri.toString(), Toast.LENGTH_SHORT ).show();
+            }
+            finish();
+        }
+    }
+
+
 }
 
 
