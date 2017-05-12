@@ -15,7 +15,7 @@ public class FavoriteMovieHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME ="favortieMovieHelper.db";
 
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     public FavoriteMovieHelper(Context context)
     {
@@ -42,7 +42,8 @@ public class FavoriteMovieHelper extends SQLiteOpenHelper {
                 MOVIE_ID + " TEXT NOT NULL,"  +
                 FavoriteMovieEntry.MOVIE_NAME+ " TEXT NOT NULL," +
                 FavoriteMovieEntry.RELEASE_DATE+ " TEXT NOT NULL," +
-                FavoriteMovieEntry.MOVIE_REVIEW+ " TEXT NOT NULL" + ");";
+                FavoriteMovieEntry.MOVIE_REVIEW+ " TEXT NOT NULL," +
+                FavoriteMovieEntry.MOVIE_POSTER_PATH+ " TEXT NOT NULL" + ");";
 
 
         db.execSQL(SQL_CREATE_FAVORITE_MOVIE_TABLE);

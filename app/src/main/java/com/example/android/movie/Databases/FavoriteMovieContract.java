@@ -35,7 +35,8 @@ public class FavoriteMovieContract {
         public static final String MOVIE_ID = "movieId";
         public static final String MOVIE_NAME = "movieName";
         public static final String RELEASE_DATE = "releaseDate";
-        public static final String MOVIE_REVIEW = "moviewReview";
+        public static final String MOVIE_REVIEW = "movieReview";
+        public static final String MOVIE_POSTER_PATH = "posterPath";
 
     }
 }

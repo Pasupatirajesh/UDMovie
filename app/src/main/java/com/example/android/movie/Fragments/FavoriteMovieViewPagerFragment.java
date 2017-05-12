@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.example.android.movie.Databases.FavoriteMovieContract.FavoriteMovieEntry;
 import com.example.android.movie.R;
+import com.squareup.picasso.Picasso;
 
 /**
  * Created by SSubra27 on 5/8/17.
@@ -29,7 +30,7 @@ public class FavoriteMovieViewPagerFragment extends android.support.v4.app.Fragm
 
     // Create a String containing our favorite columns from the database to be returned.
 
-    String[] FAVORITE_MOVIE_PROJECTION = new String[]{FavoriteMovieEntry._ID,FavoriteMovieEntry.MOVIE_ID,FavoriteMovieEntry.MOVIE_NAME, FavoriteMovieEntry.RELEASE_DATE,FavoriteMovieEntry.MOVIE_REVIEW};
+    String[] FAVORITE_MOVIE_PROJECTION = new String[]{FavoriteMovieEntry.MOVIE_NAME, FavoriteMovieEntry.MOVIE_REVIEW, FavoriteMovieEntry.MOVIE_POSTER_PATH};
 
     public static final int FAVORITE_MOVIE_LOADER =44;
 
@@ -37,10 +38,9 @@ public class FavoriteMovieViewPagerFragment extends android.support.v4.app.Fragm
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getActivity().getSupportLoaderManager().initLoader(FAVORITE_MOVIE_LOADER,null,this);
-
     }
 
-    @Nullable
+     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         inflater= LayoutInflater.from(getActivity());
@@ -57,35 +57,43 @@ public class FavoriteMovieViewPagerFragment extends android.support.v4.app.Fragm
     }
 
     @Override
-    public Loader onCreateLoader(int id, Bundle args) {
+    public  Loader onCreateLoader(int id, Bundle args) {
 
         switch (id)
         {
-          case  FAVORITE_MOVIE_LOADER: Uri favoriteMovieQueryUri = FavoriteMovieEntry.CONTENT_URI;
+          case  FAVORITE_MOVIE_LOADER:
 
-            String sortOrder = FavoriteMovieEntry.RELEASE_DATE + "ASC";
+              Uri favoriteMovieQueryUri = FavoriteMovieEntry.CONTENT_URI;
 
-            String selection = FavoriteMovieEntry.TABLE_NAME;
+              String sortOrder = FavoriteMovieEntry.RELEASE_DATE+ " ASC";
 
-            return new CursorLoader(getActivity(), favoriteMovieQueryUri, FAVORITE_MOVIE_PROJECTION, selection, null, sortOrder);
-          default:
+              String selection = null;
+
+              return  new CursorLoader(getActivity(), favoriteMovieQueryUri, FAVORITE_MOVIE_PROJECTION, selection, null, sortOrder);
+
+            default:
               throw new RuntimeException("Loader not implemented: "+id);
         }
+
 
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        data.moveToFirst();
+       data.moveToFirst();
 
-        Log.i("FragmentCursor", data.getString(data.getColumnIndex(FavoriteMovieEntry.MOVIE_NAME)));
-        while(!data.isAfterLast())
-        {
-            mTitleTextView.setText(data.getString(data.getColumnIndex(FavoriteMovieEntry.MOVIE_NAME)));
-            mSysnopsisTextView.setText(data.getString(data.getColumnIndex(FavoriteMovieEntry.MOVIE_REVIEW)));
-            data.moveToNext();
+       Log.i("FragmentCursor", data.getString(data.getColumnIndex(FavoriteMovieEntry.MOVIE_NAME)));
+
+        Log.i("dataCount", ""+ data.getCount());
+       while(!data.isAfterLast())
+       {
+           mTitleTextView.setText(data.getString(data.getColumnIndex(FavoriteMovieEntry.MOVIE_NAME)));
+           mSysnopsisTextView.setText(data.getString(data.getColumnIndex(FavoriteMovieEntry.MOVIE_REVIEW)));
+           String moviePosterPath = data.getString(data.getColumnIndex(FavoriteMovieEntry.MOVIE_POSTER_PATH));
+           String movieImageUri = "https://image.tmdb.org/t/p/w185/"+ moviePosterPath;
+           Picasso.with(getActivity()).load(movieImageUri).into(mPosterImageView);
+           data.moveToNext();
         }
-
 
     }
     @Override

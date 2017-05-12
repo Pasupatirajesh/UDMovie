@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import static com.example.android.movie.Databases.FavoriteMovieContract.*;
 import static com.example.android.movie.Databases.FavoriteMovieContract.FavoriteMovieEntry.TABLE_NAME;
 
 /**
@@ -31,9 +32,9 @@ public class FavoriteMovieContentProvider extends ContentProvider {
     {
         UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
-        uriMatcher.addURI(FavoriteMovieContract.AUTHORITY, FavoriteMovieContract.PATH_TASKS, FAVORITEMOVIES);
+        uriMatcher.addURI(AUTHORITY, PATH_TASKS, FAVORITEMOVIES);
 
-        uriMatcher.addURI(FavoriteMovieContract.AUTHORITY, FavoriteMovieContract.PATH_TASKS + "/#", FAVORITEMOVIES_WITH_ID);
+        uriMatcher.addURI(AUTHORITY, PATH_TASKS + "/#", FAVORITEMOVIES_WITH_ID);
 
         return uriMatcher;
     }
@@ -56,16 +57,17 @@ public class FavoriteMovieContentProvider extends ContentProvider {
 
         switch (match)
         {
-            case FAVORITEMOVIES:
-                retCursor = mdb.query(FavoriteMovieContract.FavoriteMovieEntry.TABLE_NAME,
-                                      projection,
-                                      selection,
-                                      selectionArgs,
-                                      null,
-                                      null,
-                                      sortOrder);
+            case FAVORITEMOVIES: {
+                retCursor = mdb.query(FavoriteMovieEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
 
                 break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: "+uri);
         }
@@ -96,7 +98,7 @@ public class FavoriteMovieContentProvider extends ContentProvider {
                 if(id >0)
                 {
                     // Success
-                    returnUri = ContentUris.withAppendedId(FavoriteMovieContract.FavoriteMovieEntry.CONTENT_URI,id);
+                    returnUri = ContentUris.withAppendedId(FavoriteMovieEntry.CONTENT_URI,id);
 
                 } else
                 {

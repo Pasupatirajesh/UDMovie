@@ -124,8 +124,6 @@ public class Network {
 
         URL url = buildUrl(filter);
         String responseStringJson =  getResponseFromHttpUrl(url);
-
-
         JSONObject jsonObject = new JSONObject(responseStringJson);
         parseItems(arrayList, jsonObject);
         return arrayList;

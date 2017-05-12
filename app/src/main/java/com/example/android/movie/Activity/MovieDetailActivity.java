@@ -130,8 +130,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         String selection = FavoriteMovieEntry.MOVIE_ID + "=?";
 
         String[] selectionargs = {String.valueOf(movieId)};
-        }
-        });
+
         return mDb.query(table,columns,selection, selectionargs,null,null,null,null);
 
     }
@@ -145,6 +144,7 @@ public class MovieDetailActivity extends AppCompatActivity {
             cv.put(FavoriteMovieEntry.MOVIE_NAME, movie.getMovieName());
             cv.put(FavoriteMovieEntry.RELEASE_DATE, movie.getMovieReleaseDate());
             cv.put(FavoriteMovieEntry.MOVIE_REVIEW, movie.getMovieInfo());
+            cv.put(FavoriteMovieEntry.MOVIE_POSTER_PATH, movie.getMoviePosterPath());
 
             Uri uri = getContentResolver().insert(FavoriteMovieEntry.CONTENT_URI, cv);
 
