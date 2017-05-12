@@ -1,12 +1,7 @@
 package com.example.android.movie.Fragments;
 
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,90 +9,64 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.android.movie.Databases.FavoriteMovieContract.FavoriteMovieEntry;
+import com.example.android.movie.Movie.Movie;
 import com.example.android.movie.R;
 import com.squareup.picasso.Picasso;
+
+import org.parceler.Parcels;
 
 /**
  * Created by SSubra27 on 5/8/17.
  */
 
-public class FavoriteMovieViewPagerFragment extends android.support.v4.app.Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class FavoriteMovieViewPagerFragment extends android.support.v4.app.Fragment {
 
     private TextView mTitleTextView;
     private ImageView mPosterImageView;
     private TextView mSysnopsisTextView;
 
-    // Create a String containing our favorite columns from the database to be returned.
+    private Movie mMovie;
 
-    String[] FAVORITE_MOVIE_PROJECTION = new String[]{FavoriteMovieEntry.MOVIE_NAME, FavoriteMovieEntry.MOVIE_REVIEW, FavoriteMovieEntry.MOVIE_POSTER_PATH};
-
-    public static final int FAVORITE_MOVIE_LOADER =44;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActivity().getSupportLoaderManager().initLoader(FAVORITE_MOVIE_LOADER,null,this);
+
+
     }
 
-     @Nullable
+
+    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        inflater= LayoutInflater.from(getActivity());
+
+         inflater= LayoutInflater.from(getActivity());
         View v = inflater.inflate(R.layout.favorites_fragment, container, false);
 
-        mTitleTextView =(TextView) v.findViewById(R.id.tv_fav_title_text_view);
 
-        mPosterImageView = (ImageView) v.findViewById(R.id.iv_fav_poster_view);
+        Bundle myBundle = this.getArguments();
 
-        mSysnopsisTextView = (TextView) v.findViewById(R.id.tv_fav_synopsis_view);
+        if(myBundle!=null) {
+            if (myBundle.getParcelable("Movie") != null) {
 
+                mMovie = Parcels.unwrap(myBundle.getParcelable("Movie"));
+
+                Log.i("movieName", mMovie.getMovieName());
+                mTitleTextView =(TextView) v.findViewById(R.id.tv_fav_title_text_view);
+
+                mPosterImageView = (ImageView) v.findViewById(R.id.iv_fav_poster_view);
+
+                mSysnopsisTextView = (TextView) v.findViewById(R.id.tv_fav_synopsis_view);
+
+                mTitleTextView.setText(mMovie.getMovieName());
+
+                Picasso.with(getContext()).load(mMovie.getMoviePosterPath()).into(mPosterImageView);
+
+                mSysnopsisTextView.setText(mMovie.getMovieInfo());
+
+            }
+        }
         return  v;
-
-    }
-
-    @Override
-    public  Loader onCreateLoader(int id, Bundle args) {
-
-        switch (id)
-        {
-          case  FAVORITE_MOVIE_LOADER:
-
-              Uri favoriteMovieQueryUri = FavoriteMovieEntry.CONTENT_URI;
-
-              String sortOrder = FavoriteMovieEntry.RELEASE_DATE+ " ASC";
-
-              String selection = null;
-
-              return  new CursorLoader(getActivity(), favoriteMovieQueryUri, FAVORITE_MOVIE_PROJECTION, selection, null, sortOrder);
-
-            default:
-              throw new RuntimeException("Loader not implemented: "+id);
-        }
-
-
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-       data.moveToFirst();
-
-       Log.i("FragmentCursor", data.getString(data.getColumnIndex(FavoriteMovieEntry.MOVIE_NAME)));
-
-        Log.i("dataCount", ""+ data.getCount());
-       while(!data.isAfterLast())
-       {
-           mTitleTextView.setText(data.getString(data.getColumnIndex(FavoriteMovieEntry.MOVIE_NAME)));
-           mSysnopsisTextView.setText(data.getString(data.getColumnIndex(FavoriteMovieEntry.MOVIE_REVIEW)));
-           String moviePosterPath = data.getString(data.getColumnIndex(FavoriteMovieEntry.MOVIE_POSTER_PATH));
-           String movieImageUri = "https://image.tmdb.org/t/p/w185/"+ moviePosterPath;
-           Picasso.with(getActivity()).load(movieImageUri).into(mPosterImageView);
-           data.moveToNext();
-        }
-
-    }
-    @Override
-    public void onLoaderReset(Loader loader) {
 
     }
 }

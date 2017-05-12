@@ -24,7 +24,7 @@ import org.parceler.Parcels;
 
 import static com.example.android.movie.Databases.FavoriteMovieContract.FavoriteMovieEntry;
 
-public class MovieDetailActivity extends AppCompatActivity {
+public class  MovieDetailActivity extends AppCompatActivity {
 
     private TextView mTitleTextView;
     private ImageView mPosterImageView;
