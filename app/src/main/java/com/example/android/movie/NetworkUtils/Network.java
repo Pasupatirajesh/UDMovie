@@ -27,7 +27,7 @@ public class Network {
 
     private static final String MOVIE_API_TRAILER_URL = "http://api.themoviedb.org/3/movie/";
 
-    private static final String API_KEY = "0c8e96b68c5e24e2ee85490b30b0e383";
+    private static final String API_KEY = "YOUR_API_KEY";
 
 
 
@@ -78,7 +78,7 @@ public class Network {
     public static URL buildTrailerUrl(String movieId)
     {
         Uri trailerUri = Uri.parse(MOVIE_API_TRAILER_URL).buildUpon()
-                .appendPath(movieId+"/videos?")
+                .appendPath(movieId).appendPath("videos")
                 .appendQueryParameter("method", "get")
                 .appendQueryParameter("api_key", API_KEY)
                 .appendQueryParameter("format", "json")
@@ -115,6 +115,32 @@ public class Network {
             }
         } finally {
             connection.disconnect();
+        }
+    }
+
+    public ArrayList<Movie> fetchTrailerItems(String movieId) throws JSONException, IOException
+    {
+        ArrayList<Movie> arrayList = new ArrayList<>();
+        URL url = buildTrailerUrl(movieId);
+        String responseStringJson = getResponseFromHttpUrl(url);
+        JSONObject jsonObject = new JSONObject(responseStringJson);
+        parseTrailerItems(arrayList,jsonObject);
+        return arrayList;
+    }
+
+    private void parseTrailerItems(ArrayList<Movie> arrayList, JSONObject jsonObject) throws JSONException {
+        JSONArray jsonArray = jsonObject.getJSONArray("results");
+        int i=0;
+        {
+            JSONObject trailerJsonObject = jsonArray.getJSONObject(i);
+
+            Movie movie = new Movie();
+
+            movie.mTrailerKey = trailerJsonObject.getString("key");
+
+            arrayList.add(movie);
+
+
         }
     }
 

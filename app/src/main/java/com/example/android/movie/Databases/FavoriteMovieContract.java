@@ -20,6 +20,8 @@ public class FavoriteMovieContract {
 
     public static final String PATH_TASKS = "favoriteMovies";
 
+    public static final String PATH_TASKS_WITH_ID = "favoriteMovies_with_id";
+
 
 
     private FavoriteMovieContract()
@@ -30,6 +32,8 @@ public class FavoriteMovieContract {
     public static class FavoriteMovieEntry implements BaseColumns {
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_TASKS).build();
+
+        public static final Uri CONTENT_URI_WITH_ID = BASE_CONTENT_URI.buildUpon().appendPath(PATH_TASKS_WITH_ID).build();
 
         public static final String TABLE_NAME = "favoriteMovie";
         public static final String MOVIE_ID = "movieId";

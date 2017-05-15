@@ -28,6 +28,16 @@ public class Movie {
 
     public String mMovieInfo;
 
+    public String getTrailerKey() {
+        return mTrailerKey;
+    }
+
+    public void setTrailerKey(String trailerKey) {
+        mTrailerKey = trailerKey;
+    }
+
+    public String mTrailerKey;
+
     public Movie()
     {
         super();

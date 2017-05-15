@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -21,6 +22,8 @@ import com.example.android.movie.R;
 import com.squareup.picasso.Picasso;
 
 import org.parceler.Parcels;
+
+import java.util.ArrayList;
 
 import static com.example.android.movie.Databases.FavoriteMovieContract.FavoriteMovieEntry;
 
@@ -41,6 +44,8 @@ public class  MovieDetailActivity extends AppCompatActivity {
 
     private Cursor mCursor;
 
+    private ArrayList<Movie> mTrailerArrayList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,7 +61,7 @@ public class  MovieDetailActivity extends AppCompatActivity {
         mFavButton = (Button)findViewById(R.id.add_to_fav_button);
 
 
-
+        mTrailerArrayList = new ArrayList<>();
         Bundle myIntent = getIntent().getExtras();
 
         if(myIntent !=null) {
@@ -100,14 +105,11 @@ public class  MovieDetailActivity extends AppCompatActivity {
 
 
         }
-        // Method not complete yet, as I am trying to figure out the right way to pass the network endpoint
-
         mTrailerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i("mTrailerButton", "I was clicked");
-                Intent trailerIntent = new Intent(Intent.ACTION_VIEW);
-                startActivity(trailerIntent);
+                new FetchTrailerTask().execute();
             }
         });
 
@@ -118,6 +120,40 @@ public class  MovieDetailActivity extends AppCompatActivity {
                 onClickAddMovie(v);
             }
         });
+    }
+
+
+
+    public class FetchTrailerTask extends AsyncTask<Void, Void, ArrayList<Movie>>
+    {
+
+        @Override
+        protected ArrayList<Movie> doInBackground(Void... params) {
+
+            try {
+                return new Network().fetchTrailerItems(String.valueOf(movie.getMovieId()));
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<Movie> movies) {
+            super.onPostExecute(movies);
+            mTrailerArrayList=movies;
+            Log.i("TrailerArrayList", ""+mTrailerArrayList.size());
+            for(int j=0;j<mTrailerArrayList.size(); j++)
+            {
+
+                String trailerKey =mTrailerArrayList.get(0).getTrailerKey();
+                Log.i("trailerKey", ""+trailerKey);
+                Intent trailerIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://youtube.com/watch?v="+ trailerKey));
+                startActivity(trailerIntent);
+            }
+        }
     }
 
 

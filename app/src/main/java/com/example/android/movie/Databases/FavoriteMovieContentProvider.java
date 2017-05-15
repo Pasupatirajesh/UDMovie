@@ -10,9 +10,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
-import static com.example.android.movie.Databases.FavoriteMovieContract.*;
+import static com.example.android.movie.Databases.FavoriteMovieContract.AUTHORITY;
+import static com.example.android.movie.Databases.FavoriteMovieContract.FavoriteMovieEntry;
+import static com.example.android.movie.Databases.FavoriteMovieContract.FavoriteMovieEntry.MOVIE_ID;
 import static com.example.android.movie.Databases.FavoriteMovieContract.FavoriteMovieEntry.TABLE_NAME;
+import static com.example.android.movie.Databases.FavoriteMovieContract.PATH_TASKS;
 
 /**
  * Created by SSubra27 on 5/8/17.
@@ -118,7 +122,36 @@ public class FavoriteMovieContentProvider extends ContentProvider {
 
     @Override
     public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
-        return 0;
+        final SQLiteDatabase mDb = mFavoriteMovieHelper.getWritableDatabase();
+
+        int match = sUriMatcher.match(uri);
+
+        int numberOfMovieDeleted;
+
+        String movieIdToDelete = uri.getPathSegments().get(1);
+
+        Log.i("movieToDelete", movieIdToDelete);
+
+        switch(match)
+        {
+            case FAVORITEMOVIES_WITH_ID:
+
+                numberOfMovieDeleted = mDb.delete(TABLE_NAME, MOVIE_ID+ "=?", new String[]{movieIdToDelete});
+                numberOfMovieDeleted++;
+
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: "+uri);
+        }
+        if(numberOfMovieDeleted !=0)
+        {
+            getContext().getContentResolver().notifyChange(uri,null);
+        }
+
+        Log.i("movieDeleted", numberOfMovieDeleted+"");
+        return numberOfMovieDeleted;
+
+
     }
 
     @Override
