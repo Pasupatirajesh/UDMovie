@@ -16,6 +16,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.example.android.movie.Databases.FavoriteMovieContract;
 import com.example.android.movie.Fragments.FavoriteMovieViewPagerFragment;
@@ -163,6 +164,9 @@ public class FavoriteMovieDisplayActivity extends AppCompatActivity implements L
                     ContentResolver cr = getContentResolver();
 
                     cr.delete(uri, null , null);
+                } else
+                {
+                    Toast.makeText(this, "No Favorites yet!!! start adding them", Toast.LENGTH_LONG).show();
                 }
                 Intent myIntent  = new Intent(this,FavoriteMovieDisplayActivity.class);
 

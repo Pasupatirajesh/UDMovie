@@ -27,7 +27,7 @@ public class Network {
 
     private static final String MOVIE_API_TRAILER_URL = "http://api.themoviedb.org/3/movie/";
 
-    private static final String API_KEY = "YOUR_API_KEY";
+    private static final String API_KEY = "YOUR API_KEY";
 
 
 
