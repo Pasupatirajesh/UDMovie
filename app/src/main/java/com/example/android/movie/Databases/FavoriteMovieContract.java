@@ -7,6 +7,7 @@ import android.provider.BaseColumns;
  * Created by SSubra27 on 5/2/17.
  */
 
+//Implemented based on coursework completed on Udacity.com
 public class FavoriteMovieContract {
 
     // <scheme> :// <Content authority> /<path> ( scheme + Content authority + Base content + Path)

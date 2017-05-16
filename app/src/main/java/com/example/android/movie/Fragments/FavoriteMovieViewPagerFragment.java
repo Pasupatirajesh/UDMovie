@@ -18,6 +18,7 @@ import org.parceler.Parcels;
  * Created by SSubra27 on 5/8/17.
  */
 
+// Referred to guides.codepath.com and stackoverflow for implementing a Fragment
 public class FavoriteMovieViewPagerFragment extends android.support.v4.app.Fragment {
 
     private TextView mTitleTextView;

@@ -22,6 +22,7 @@ import static com.example.android.movie.Databases.FavoriteMovieContract.PATH_TAS
  * Created by SSubra27 on 5/8/17.
  */
 
+//Implemented based on coursework completed on Udacity.com
 public class FavoriteMovieContentProvider extends ContentProvider {
 
     private FavoriteMovieHelper mFavoriteMovieHelper; // member variable for he SQLite database that the content provider needs to work with

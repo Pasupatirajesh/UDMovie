@@ -11,6 +11,8 @@ import static com.example.android.movie.Databases.FavoriteMovieContract.Favorite
  * Created by SSubra27 on 5/2/17.
  */
 
+//Implemented based on coursework completed on Udacity.com
+
 public class FavoriteMovieHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME ="favortieMovieHelper.db";

@@ -30,6 +30,8 @@ import org.parceler.Parcels;
 
 import java.util.ArrayList;
 
+//Referred to guides.codepath.com for checking network connectivity
+
 public class MovieActivity extends AppCompatActivity implements MovieAdapter.onItemClickInterface{
 
     private static final String FILTER = "filter";

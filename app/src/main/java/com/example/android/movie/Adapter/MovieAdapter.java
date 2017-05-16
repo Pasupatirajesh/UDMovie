@@ -18,6 +18,8 @@ import java.util.ArrayList;
  * Created by SSubra27 on 3/20/17.
  */
 
+// Implemented based on knowledge gained from bignerdranch.com and stackoverflow.com
+    
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
 
     private Context context;

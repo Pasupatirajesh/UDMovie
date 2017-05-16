@@ -25,9 +25,11 @@ import com.example.android.movie.R;
 
 import java.util.ArrayList;
 
+// Referred to guides.codepath.com and stackoverflow for implementing a viewpager and FragmentStatePagerAdapter
+
 public class FavoriteMovieDisplayActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    public PagerAdapter mFragmentPagerAdapter;
+    public  PagerAdapter mFragmentPagerAdapter;
     private ViewPager mViewPager;
 
     private ArrayList<Movie> mFavMovies = new ArrayList<>();
