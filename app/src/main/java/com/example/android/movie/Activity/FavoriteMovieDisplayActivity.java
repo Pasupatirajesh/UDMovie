@@ -1,5 +1,7 @@
 package com.example.android.movie.Activity;
 
+import android.content.ContentResolver;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,6 +14,8 @@ import android.support.v4.content.Loader;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.example.android.movie.Databases.FavoriteMovieContract;
 import com.example.android.movie.Fragments.FavoriteMovieViewPagerFragment;
@@ -57,7 +61,6 @@ public class FavoriteMovieDisplayActivity extends AppCompatActivity implements L
             default:
                 throw new RuntimeException("Loader not implemented: "+id);
         }
-
 
     }
 
@@ -112,12 +115,13 @@ public class FavoriteMovieDisplayActivity extends AppCompatActivity implements L
         public MyPagerAdapter(FragmentManager fm)
         {
             super(fm);
+
         }
         @Override
         public Fragment getItem(int position) {
            movie = mFavMovies.get(position);
 
-          return FavoriteMovieViewPagerFragment.newInstance(movie, position);
+          return FavoriteMovieViewPagerFragment.newInstance(movie);
         }
 
         @Override
@@ -131,6 +135,43 @@ public class FavoriteMovieDisplayActivity extends AppCompatActivity implements L
         public int getItemPosition(Object object) {
             return super.getItemPosition(object);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.fragment_menu,menu);
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId())
+        {
+            case R.id.menu_delete:
+
+                String movieId = null;
+
+                if(movieId!=null)
+                {
+                    movieId = ""+ mFavMovies.get(mViewPager.getCurrentItem()).getMovieId();
+                    Uri uri = FavoriteMovieContract.FavoriteMovieEntry.CONTENT_URI;
+
+                    uri = uri.buildUpon().appendPath(movieId).build();
+
+                    ContentResolver cr = getContentResolver();
+
+                    cr.delete(uri, null , null);
+                }
+                Intent myIntent  = new Intent(this,FavoriteMovieDisplayActivity.class);
+
+                startActivity(myIntent);
+
+                break;
+
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
 

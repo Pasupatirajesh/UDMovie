@@ -1,28 +1,18 @@
 package com.example.android.movie.Fragments;
 
-import android.content.ContentResolver;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.android.movie.Activity.FavoriteMovieDisplayActivity;
 import com.example.android.movie.Movie.Movie;
 import com.example.android.movie.R;
 import com.squareup.picasso.Picasso;
 
 import org.parceler.Parcels;
-
-import static com.example.android.movie.Databases.FavoriteMovieContract.FavoriteMovieEntry;
 
 /**
  * Created by SSubra27 on 5/8/17.
@@ -36,11 +26,10 @@ public class FavoriteMovieViewPagerFragment extends android.support.v4.app.Fragm
 
     private static Movie mMovie = new Movie();
 
-    public static FavoriteMovieViewPagerFragment newInstance(Movie movie, int position) {
+    public static FavoriteMovieViewPagerFragment newInstance(Movie movie) {
         FavoriteMovieViewPagerFragment f = new FavoriteMovieViewPagerFragment();
         Bundle args = new Bundle();
         args.putParcelable("Movie", Parcels.wrap(movie));
-        args.putInt("arrayListPosition", position);
         f.setArguments(args);
         return f;
     }
@@ -49,8 +38,6 @@ public class FavoriteMovieViewPagerFragment extends android.support.v4.app.Fragm
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-
     }
 
     @Nullable
@@ -70,8 +57,6 @@ public class FavoriteMovieViewPagerFragment extends android.support.v4.app.Fragm
         if (myBundle != null) {
             if (myBundle.getParcelable("Movie") != null) {
 
-                Log.i("movieId", ""+mMovie.getMovieId());
-
                 mMovie = Parcels.unwrap(myBundle.getParcelable("Movie"));
 
                 mTitleTextView.setText(mMovie.getMovieName());
@@ -83,47 +68,10 @@ public class FavoriteMovieViewPagerFragment extends android.support.v4.app.Fragm
                 mSynopsisTextView.setText(mMovie.getMovieInfo());
 
                 }
-
-               if(myBundle.getInt("arrayListPosiiton") >=0)
-               {
-                   Log.i("position", ""+myBundle.getInt("arrayListPosiiton"));
-               }
             }
 
             return v;
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.fragment_menu,menu);
-    }
 
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId())
-        {
-            case R.id.menu_delete:
-
-                Uri uri = FavoriteMovieEntry.CONTENT_URI;
-
-                uri = uri.buildUpon().appendPath(""+mMovie.getMovieId()).build();
-
-                Log.i("uri", uri+"");
-
-                ContentResolver cr = getContext().getContentResolver();
-
-                cr.delete(uri, null , null);
-
-                Intent myIntent  = new Intent(getContext(),FavoriteMovieDisplayActivity.class);
-
-                startActivity(myIntent);
-
-
-                break;
-
-        }
-        return super.onOptionsItemSelected(item);
-    }
 }
