@@ -2,6 +2,7 @@ package com.example.android.movie.Activity;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -150,8 +151,18 @@ public class  MovieDetailActivity extends AppCompatActivity {
 
                 String trailerKey =mTrailerArrayList.get(0).getTrailerKey();
                 Log.i("trailerKey", ""+trailerKey);
+                PackageManager pm = getPackageManager();
+
                 Intent trailerIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://youtube.com/watch?v="+ trailerKey));
-                startActivity(trailerIntent);
+
+                if(trailerIntent.resolveActivity(pm)!=null)
+                {
+                    startActivity(trailerIntent);
+                }
+                else
+                {
+                    Toast.makeText(MovieDetailActivity.this, "Suitable App not available", Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }

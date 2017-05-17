@@ -21,6 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.movie.Adapter.MovieAdapter;
+import com.example.android.movie.Misc.AsynctaskCompleteListener;
+import com.example.android.movie.Misc.FetchMovieTask;
 import com.example.android.movie.Movie.Movie;
 import com.example.android.movie.NetworkUtils.Network;
 import com.example.android.movie.R;
@@ -63,31 +65,39 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.onI
                         .setAction("Action", null).show();
             }
         });
-        if(savedInstanceState!=null)
-        {
-            sort = savedInstanceState.getBoolean(FILTER);
-        }
-
-
         mMovieArrayList = new ArrayList<>();
-        mMovieRecyclerView=(RecyclerView) findViewById(R.id.rv_movie_list_view);
-        mGridLayoutManager = new GridLayoutManager(MovieActivity.this,2);
+        mMovieRecyclerView = (RecyclerView) findViewById(R.id.rv_movie_list_view);
+        mGridLayoutManager = new GridLayoutManager(MovieActivity.this, 2);
         mMovieRecyclerView.setLayoutManager(mGridLayoutManager);
-        mMovieAdapter = new MovieAdapter(getApplicationContext(), mMovieArrayList, this);
-        mMovieRecyclerView.setAdapter(mMovieAdapter);
 
-        mMovieRecyclerView.setHasFixedSize(true);
+        if(savedInstanceState!=null) {
 
-        if(isOnline())
-        {
-            new FetchMovieTask().execute();
+            sort = savedInstanceState.getBoolean(FILTER);
+            mMovieArrayList = Parcels.unwrap(savedInstanceState.getParcelable("PopularData"));
+            mGridLayoutManager.onRestoreInstanceState(savedInstanceState.getParcelable("scrollPosition"));
+            mMovieAdapter = new MovieAdapter(getApplicationContext(), mMovieArrayList, this);
+            mMovieRecyclerView.setAdapter(mMovieAdapter);
+            mMovieRecyclerView.setHasFixedSize(true);
         } else
         {
-            setContentView(R.layout.activity_main_no_network);
-            mNonetworkTextView=(TextView) findViewById(R.id.tv_offline_text_view);
-            mNonetworkTextView.setText(R.string.message_for_no_network);
+            new FetchMovieTask(this, new AsynctaskCompleteListener<ArrayList<Movie>>() {
+                @Override
+                public void onTaskComplete(ArrayList<Movie> result) {
+                    mMovieArrayList = result;
+                    mMovieAdapter = new MovieAdapter(getApplicationContext(), mMovieArrayList, MovieActivity.this);
+                    mMovieRecyclerView.setAdapter(mMovieAdapter);
+                    mMovieRecyclerView.setHasFixedSize(true);
+                }
+            }).execute();
         }
 
+
+        if(!isOnline())
+        {
+            setContentView(R.layout.activity_main_no_network);
+            mNonetworkTextView = (TextView) findViewById(R.id.tv_offline_text_view);
+            mNonetworkTextView.setText(R.string.message_for_no_network);
+        }
     }
 
     @Override
@@ -111,28 +121,6 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.onI
         startActivity(myIntent);
     }
 
-    public class FetchMovieTask extends AsyncTask<Void ,Void, ArrayList<Movie>>
-    {
-
-        @Override
-        protected ArrayList<Movie> doInBackground(Void... params) {
-            try
-            {
-                return new Network().fetchItems(true);
-            } catch (Exception e)
-            {
-                e.printStackTrace();
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<Movie> s) {
-          super.onPostExecute(s);
-            mMovieArrayList = s;
-            mMovieAdapter.setMovieData(mMovieArrayList);
-        }
-    }
     public class FetchFilterMovieTask extends AsyncTask<Void ,Void, ArrayList<Movie>>
     {
 
@@ -159,8 +147,10 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.onI
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
-        super.onSaveInstanceState(outState);
         outState.putBoolean(FILTER, sort);
+        outState.putParcelable("PopularData",Parcels.wrap(mMovieArrayList));
+        outState.putParcelable("scrollPosition", mGridLayoutManager.onSaveInstanceState());
+        super.onSaveInstanceState(outState);
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -184,13 +174,17 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.onI
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-
-
         switch (id) {
             case R.id.menu_filter:
-                new FetchMovieTask().execute();
+                new FetchMovieTask(this, new AsynctaskCompleteListener<ArrayList<Movie>>() {
+                    @Override
+                    public void onTaskComplete(ArrayList<Movie> result) {
+                        mMovieArrayList = result;
+                        mMovieAdapter = new MovieAdapter(getApplicationContext(), mMovieArrayList, MovieActivity.this);
+                        mMovieRecyclerView.setAdapter(mMovieAdapter);
+                        mMovieRecyclerView.setHasFixedSize(true);
+                    }
+                    }).execute();
                     sort = !sort;
                     this.invalidateOptionsMenu();
                     upDateUI();

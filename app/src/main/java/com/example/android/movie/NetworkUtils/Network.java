@@ -31,7 +31,7 @@ public class Network {
 
     private static final String MOVIE_API_TRAILER_URL = "http://api.themoviedb.org/3/movie/";
 
-    private static final String API_KEY = "YOUR API_KEY";
+    private static final String API_KEY = "0c8e96b68c5e24e2ee85490b30b0e383";
 
 
 
