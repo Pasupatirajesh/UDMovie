@@ -28,6 +28,8 @@ public class Movie {
 
     public String mMovieInfo;
 
+    public String mUserReview;
+
     public String getTrailerKey() {
         return mTrailerKey;
     }
@@ -84,4 +86,11 @@ public class Movie {
     }
 
 
+    public String getUserReview() {
+        return mUserReview;
+    }
+
+    public void setUserReview(String userReview) {
+        mUserReview = userReview;
+    }
 }

@@ -14,6 +14,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -159,6 +160,7 @@ public class FavoriteMovieDisplayActivity extends AppCompatActivity implements L
                 if(movieId!=null)
                 {
                     movieId = ""+ mFavMovies.get(mViewPager.getCurrentItem()).getMovieId();
+                    Log.i("movieId", movieId);
                     Uri uri = FavoriteMovieContract.FavoriteMovieEntry.CONTENT_URI;
 
                     uri = uri.buildUpon().appendPath(movieId).build();

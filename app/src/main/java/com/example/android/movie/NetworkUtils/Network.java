@@ -31,6 +31,8 @@ public class Network {
 
     private static final String MOVIE_API_TRAILER_URL = "http://api.themoviedb.org/3/movie/";
 
+    private static final String MOVIE_API_USER_REVIEW_URL = "http://api.themoviedb.org/3/movie/";
+
     private static final String API_KEY = "0c8e96b68c5e24e2ee85490b30b0e383";
 
 
@@ -39,7 +41,7 @@ public class Network {
 
         Uri queryUrl;
 
-        if(topRated==true)
+        if(topRated)
         {
             queryUrl = Uri.parse(MOVIE_API_TOP_RATED_URL).buildUpon()
                     .appendQueryParameter("method", "get")
@@ -74,25 +76,48 @@ public class Network {
 
     
 
-    public static URL buildTrailerUrl(String movieId)
+    public static URL buildTrailerUrl(String movieId, boolean video)
     {
-        Uri trailerUri = Uri.parse(MOVIE_API_TRAILER_URL).buildUpon()
-                .appendPath(movieId).appendPath("videos")
-                .appendQueryParameter("method", "get")
-                .appendQueryParameter("api_key", API_KEY)
-                .appendQueryParameter("format", "json")
-                .appendQueryParameter("nojsoncallback", "1")
-                .build();
-        URL trailerUrl = null;
-        Log.i("TrailerURL", ""+trailerUrl);
-        try
+        if(video)
         {
-            trailerUrl = new URL(trailerUri.toString());
-        }catch (MalformedURLException moe)
+            Uri trailerUri = Uri.parse(MOVIE_API_TRAILER_URL).buildUpon()
+                    .appendPath(movieId).appendPath("videos")
+                    .appendQueryParameter("method", "get")
+                    .appendQueryParameter("api_key", API_KEY)
+                    .appendQueryParameter("format", "json")
+                    .appendQueryParameter("nojsoncallback", "1")
+                    .build();
+            URL trailerUrl = null;
+            Log.i("TrailerURL", ""+trailerUrl);
+            try
+            {
+                trailerUrl = new URL(trailerUri.toString());
+            }catch (MalformedURLException moe)
+            {
+                moe.printStackTrace();
+            }
+            return trailerUrl;
+        } else
         {
-            moe.printStackTrace();
+            Uri reviewUri = Uri.parse(MOVIE_API_USER_REVIEW_URL).buildUpon()
+                            .appendPath(movieId).appendPath("reviews")
+                            .appendQueryParameter("method", "get")
+                            .appendQueryParameter("api_key",API_KEY)
+                            .appendQueryParameter("format", "json")
+                            .appendQueryParameter("nojsoncallback", "1")
+                            .build();
+            URL reviewUrl = null;
+
+            try
+            {
+                reviewUrl= new URL(reviewUri.toString());
+            } catch (MalformedURLException e)
+            {
+                e.printStackTrace();
+            }
+            return reviewUrl;
         }
-        return trailerUrl;
+
     }
 
 
@@ -118,14 +143,36 @@ public class Network {
         }
     }
 
-    public ArrayList<Movie> fetchTrailerItems(String movieId) throws JSONException, IOException
+    public ArrayList<Movie> fetchTrailerItems(String movieId, boolean video) throws JSONException, IOException
     {
         ArrayList<Movie> arrayList = new ArrayList<>();
-        URL url = buildTrailerUrl(movieId);
+
+        ArrayList<Movie> reviewArrayList = new ArrayList<>();
+        URL url=null;
+        if(video)
+        {
+            url = buildTrailerUrl(movieId,true);
+        } else
+        {
+            url = buildTrailerUrl(movieId,false);
+            Log.i("falseUrl", url+"");
+        }
+
         String responseStringJson = getResponseFromHttpUrl(url);
+
+        Log.i("responseStringJson", responseStringJson);
+
         JSONObject jsonObject = new JSONObject(responseStringJson);
-        parseTrailerItems(arrayList,jsonObject);
-        return arrayList;
+
+        if(video)
+        {
+            parseTrailerItems(arrayList,jsonObject);
+            return arrayList;
+        } else
+        {
+            parseReviewItems(reviewArrayList,jsonObject);
+            return reviewArrayList;
+        }
     }
 
     private void parseTrailerItems(ArrayList<Movie> arrayList, JSONObject jsonObject) throws JSONException {
@@ -138,7 +185,25 @@ public class Network {
 
             movie.mTrailerKey = trailerJsonObject.getString("key");
 
+//            movie.mUserReview = trailerJsonObject.getString("content");
+
             arrayList.add(movie);
+        }
+    }
+    private void parseReviewItems(ArrayList<Movie> reviewArrayList, JSONObject jsonObject) throws JSONException {
+        JSONArray jsonArray = jsonObject.getJSONArray("results");
+
+        for(int i=0; i < jsonArray.length(); i++)
+        {
+            JSONObject trailerJsonObject = jsonArray.getJSONObject(i);
+
+            Movie movie = new Movie();
+
+//            movie.mTrailerKey = trailerJsonObject.getString("key");
+
+            movie.mUserReview = trailerJsonObject.getString("content");
+
+            reviewArrayList.add(movie);
         }
     }
 
@@ -149,6 +214,7 @@ public class Network {
         String responseStringJson =  getResponseFromHttpUrl(url);
         JSONObject jsonObject = new JSONObject(responseStringJson);
         parseItems(arrayList, jsonObject);
+
         return arrayList;
     }
 

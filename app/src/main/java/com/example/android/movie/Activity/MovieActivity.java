@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
@@ -22,9 +21,9 @@ import android.widget.Toast;
 
 import com.example.android.movie.Adapter.MovieAdapter;
 import com.example.android.movie.Misc.AsynctaskCompleteListener;
+import com.example.android.movie.Misc.FetchMovieFilterTask;
 import com.example.android.movie.Misc.FetchMovieTask;
 import com.example.android.movie.Movie.Movie;
-import com.example.android.movie.NetworkUtils.Network;
 import com.example.android.movie.R;
 import com.facebook.stetho.Stetho;
 
@@ -120,30 +119,6 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.onI
         Log.i("MovieParcelActivity", "onItemClicked: "+ wrapper);
         startActivity(myIntent);
     }
-
-    public class FetchFilterMovieTask extends AsyncTask<Void ,Void, ArrayList<Movie>>
-    {
-
-        @Override
-        protected ArrayList<Movie> doInBackground(Void... params) {
-            try
-            {
-
-                return new Network().fetchItems(false);
-            } catch (Exception e)
-            {
-                e.printStackTrace();
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<Movie> s) {
-            super.onPostExecute(s);
-            mMovieArrayList = s;
-            mMovieAdapter.setMovieData(mMovieArrayList);
-        }
-    }
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
@@ -199,7 +174,15 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.onI
 
     private void upDateUI() {
         if(sort)
-        new FetchFilterMovieTask().execute();
+        new FetchMovieFilterTask(this, new AsynctaskCompleteListener<ArrayList<Movie>> () {
+            @Override
+            public void onTaskComplete(ArrayList<Movie> result) {
+                mMovieArrayList=result;
+                mMovieAdapter = new MovieAdapter(getApplicationContext(), mMovieArrayList, MovieActivity.this);
+                mMovieRecyclerView.setAdapter(mMovieAdapter);
+                mMovieRecyclerView.setHasFixedSize(true);
+            }
+        }).execute();
     }
 
     private boolean isOnline()

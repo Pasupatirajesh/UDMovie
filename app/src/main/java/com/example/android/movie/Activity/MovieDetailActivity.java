@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -17,8 +16,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.movie.Databases.FavoriteMovieHelper;
+import com.example.android.movie.Misc.AsynctaskCompleteListener;
+import com.example.android.movie.Misc.FetchReviewTask;
+import com.example.android.movie.Misc.FetchTrailerTask;
 import com.example.android.movie.Movie.Movie;
-import com.example.android.movie.NetworkUtils.Network;
 import com.example.android.movie.R;
 import com.squareup.picasso.Picasso;
 
@@ -35,6 +36,7 @@ public class  MovieDetailActivity extends AppCompatActivity {
     private TextView mReleaseDateTextView;
     private TextView mAverageScoreTextView;
     private TextView mSynopsisTextView;
+    private TextView mUserReviewTextView;
     private Button mFavButton;
 
     private Button mTrailerButton;
@@ -45,7 +47,7 @@ public class  MovieDetailActivity extends AppCompatActivity {
 
     private Cursor mCursor;
 
-    private ArrayList<Movie> mTrailerArrayList;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,12 +59,11 @@ public class  MovieDetailActivity extends AppCompatActivity {
         mReleaseDateTextView=(TextView) findViewById(R.id.tv_release_date);
         mAverageScoreTextView=(TextView)findViewById(R.id.tv_avg_rating);
         mSynopsisTextView =(TextView) findViewById(R.id.tv_synopsis_view);
+        mUserReviewTextView = (TextView)findViewById(R.id.user_reviews);
 
         mTrailerButton=(Button) findViewById(R.id.bv_trailer);
         mFavButton = (Button)findViewById(R.id.add_to_fav_button);
 
-
-        mTrailerArrayList = new ArrayList<>();
         Bundle myIntent = getIntent().getExtras();
 
         if(myIntent !=null) {
@@ -77,8 +78,6 @@ public class  MovieDetailActivity extends AppCompatActivity {
                 mAverageScoreTextView.setText(avgScore);
                 mReleaseDateTextView.setText(movie.getMovieReleaseDate());
                 mSynopsisTextView.setText(movie.getMovieInfo());
-
-                Log.i("TrailerURL", "" + Network.buildTrailerUrl(String.valueOf(movie.getMovieId())));
             }
 
             FavoriteMovieHelper favoriteMovieHelper = new FavoriteMovieHelper(this);
@@ -107,12 +106,32 @@ public class  MovieDetailActivity extends AppCompatActivity {
 
         }
         mTrailerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.i("mTrailerButton", "I was clicked");
-                new FetchTrailerTask().execute();
-            }
-        });
+                                              @Override
+                                              public void onClick(View v) {
+                                                  Log.i("mTrailerButton", "I was clicked");
+                                                  new FetchTrailerTask(MovieDetailActivity.this, String.valueOf(movie.getMovieId()), new AsynctaskCompleteListener<ArrayList<Movie>>() {
+                                                      @Override
+                                                      public void onTaskComplete(ArrayList<Movie> result) {
+                                                          for (int j = 0; j < result.size(); j++) {
+
+                                                              String trailerKey = result.get(j).getTrailerKey();
+                                                              Log.i("trailerKey", "" + trailerKey);
+                                                              PackageManager pm = getPackageManager();
+
+                                                              Intent trailerIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://youtube.com/watch?v=" + trailerKey));
+
+                                                              if (trailerIntent.resolveActivity(pm) != null) {
+                                                                  startActivity(trailerIntent);
+                                                              } else {
+                                                                  Toast.makeText(MovieDetailActivity.this, "Suitable App not available", Toast.LENGTH_SHORT).show();
+                                                              }
+                                                          }
+                                                      }
+
+                                                  }).execute();
+                                              }
+                                          });
+
 
         mFavButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,53 +140,21 @@ public class  MovieDetailActivity extends AppCompatActivity {
                 onClickAddMovie(v);
             }
         });
-    }
 
-
-
-    public class FetchTrailerTask extends AsyncTask<Void, Void, ArrayList<Movie>>
-    {
-
-        @Override
-        protected ArrayList<Movie> doInBackground(Void... params) {
-
-            try {
-                return new Network().fetchTrailerItems(String.valueOf(movie.getMovieId()));
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<Movie> movies) {
-            super.onPostExecute(movies);
-            mTrailerArrayList=movies;
-            Log.i("TrailerArrayList", ""+mTrailerArrayList.size());
-            for(int j=0;j<mTrailerArrayList.size(); j++)
-            {
-
-                String trailerKey =mTrailerArrayList.get(0).getTrailerKey();
-                Log.i("trailerKey", ""+trailerKey);
-                PackageManager pm = getPackageManager();
-
-                Intent trailerIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://youtube.com/watch?v="+ trailerKey));
-
-                if(trailerIntent.resolveActivity(pm)!=null)
+        new FetchReviewTask(this, String.valueOf(movie.getMovieId()), new AsynctaskCompleteListener<ArrayList<Movie>>() {
+            @Override
+            public void onTaskComplete(ArrayList<Movie> result) {
+                if(result.size()==0)
                 {
-                    startActivity(trailerIntent);
-                }
-                else
+                  mUserReviewTextView.setText("User Review not available");
+                } else
                 {
-                    Toast.makeText(MovieDetailActivity.this, "Suitable App not available", Toast.LENGTH_SHORT).show();
+                    String userReview =result.get(0).getUserReview();
+                    mUserReviewTextView.setText(userReview);
                 }
             }
-        }
+        }).execute();
     }
-
-
     private Cursor getMovieNames(long movieId)
     {
         String table = FavoriteMovieEntry.TABLE_NAME;
